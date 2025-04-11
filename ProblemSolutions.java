@@ -1,13 +1,16 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *  Francis Olakangil / Section 001
  *
  *   This java file contains the problem solutions for the methods selectionSort,
  *   mergeSortDivisibleByKFirst, asteroidsDestroyed, and numRescueCanoes methods.
  *
  ********************************************************************/
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ProblemSolutions {
 
@@ -37,14 +40,27 @@ public class ProblemSolutions {
         int n = values.length;
 
         for (int i = 0; i < n - 1; i++) {
+            // outer loop for each elem in array (except last)
+            int targetIdx = i;
+            // assume current elem is smallest
 
-            // YOU CODE GOES HERE -- COMPLETE THE INNER LOOP OF THIS
-            // "SELECTION SORT" ALGORITHM.
-            // DO NOT FORGET TO ADD YOUR NAME / SECTION ABOVE
+            for (int j = i + 1; j < n; j++) {
+                // inner loop finding smallest elem in unsorted part of array
+                if (ascending && values[j] < values[targetIdx]) {
+                    targetIdx = j; // update to smaller elem
+                } else if (!ascending && values[j] > values[targetIdx]) {
+                    // if sorting in descending order, find largest elem
+                    targetIdx = j;
+                }
+            }
+
+            int temp = values[targetIdx]; // swap found target elem with elem at current index i
+            values[targetIdx] = values[i];
+            values[i] = temp;
 
         }
 
-    } // End class selectionSort
+    } // End method selectionSort
 
 
     /**
@@ -102,8 +118,53 @@ public class ProblemSolutions {
         // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
         // OF THIS PROGRAMMING EXERCISES.
 
-        return;
+        int leftPointer = left;
+        int rightPointer = mid + 1;
+        int mergePlace = 0;
+        // ptrs above for left and right subarrays
 
+        int[] mergedArray = new int[right - left + 1];
+        // joining two halves to hold merged result
+
+        while(leftPointer <= mid && rightPointer <= right){
+            // merging two halves making k-divisible nums come first
+            if(arr[leftPointer] % k == 0 && arr[rightPointer] % k != 0){
+                // left ptr points to k-divisible num and right ptr doesnt
+                mergedArray[mergePlace++] = arr[leftPointer++];
+            }
+            else if(arr[rightPointer] % k == 0 && arr[leftPointer] % k != 0){
+                // right ptr points to k-divisible num and left ptr doesnt
+                mergedArray[mergePlace++] = arr[rightPointer++];
+            }
+            else if(arr[leftPointer] % k == 0){
+                // both nums are k-divisible, add smaller num to mergedArray
+                mergedArray[mergePlace++] = arr[leftPointer++];
+            }
+            else if(arr[rightPointer] % k == 0){
+                mergedArray[mergePlace++] = arr[rightPointer++];
+            }
+            else {
+                // last case: if neither num k-divisible, merge based on smaller num
+                if(arr[leftPointer] <= arr[rightPointer]){
+                    mergedArray[mergePlace++] = arr[leftPointer++];
+                }
+                else {
+                    mergedArray[mergePlace++] = arr[rightPointer++];
+                }
+            }
+        }
+        while(leftPointer <= mid){
+            // add any remaining elems from left subarray to merged
+            mergedArray[mergePlace++] = arr[leftPointer++];
+        }
+        while(rightPointer <= right){
+            // same as above for right subarray
+            mergedArray[mergePlace++] = arr[rightPointer++];
+        }
+        for(int z = 0; z < mergedArray.length; z++){
+            // copy merged back into og array
+            arr[left + z] = mergedArray[z];
+        }
     }
 
 
@@ -154,9 +215,21 @@ public class ProblemSolutions {
 
     public static boolean asteroidsDestroyed(int mass, int[] asteroids) {
 
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT()
+        // CONSIDER USING ARRAYS.SORT()
 
-        return false;
+        Arrays.sort(asteroids); // sort in ascending orderto prcess smallest first
+
+        long currentMass = mass; // initial mass
+        for (int a : asteroids) {
+            // if current mass >= to asteroid's mass then asteroid can be destroyed
+            // so increase mass by asteroid's mass
+            if (currentMass >= a) {
+                currentMass += a;
+            } else {
+                return false; // if current < asteroid's mass, cannot destroy steroid
+            }
+        }
+        return true; // all destroyed
 
     }
 
@@ -192,9 +265,25 @@ public class ProblemSolutions {
 
     public static int numRescueSleds(int[] people, int limit) {
 
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT
+        // CONSIDER USING ARRAYS.SORT
 
-        return -1;
+        Arrays.sort(people);
+        // sorts people to pair lightest and heaviest
+
+        int left = 0; // ptrs for lightest (left) and heaviest (right)
+        int right = people.length - 1;
+        int sleds = 0;
+
+        while (left <= right) { // keep checking for combos
+            if (people[left] + people[right] <= limit) {
+                // if lightest and heaviest can fit on sled, then paired and left ptr moved
+                left++;
+            }
+            right--; // heaviest person gets on sled anyway
+            sleds++;
+        }
+
+        return sleds; // total sleds needed to rescue everyone
 
     }
 
